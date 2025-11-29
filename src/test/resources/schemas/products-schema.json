@@ -18,37 +18,35 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "street", "streetName", "buildingNumber", "city", "zipcode", "country", "country_code", "latitude", "longitude"],
+        "required": ["id", "name", "description", "price", "categories", "ean", "image"],
         "properties": {
           "id": {
             "type": "integer"
           },
-          "street": {
+          "name": {
             "type": "string"
           },
-          "streetName": {
+          "description": {
             "type": "string"
           },
-          "buildingNumber": {
+          "price": {
+            "type": "number",
+            "minimum": 0
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {"type": "integer"},
+                {"type": "string"}
+              ]
+            }
+          },
+          "ean": {
             "type": "string"
           },
-          "city": {
+          "image": {
             "type": "string"
-          },
-          "zipcode": {
-            "type": "string"
-          },
-          "country": {
-            "type": "string"
-          },
-          "country_code": {
-            "type": "string"
-          },
-          "latitude": {
-            "type": "number"
-          },
-          "longitude": {
-            "type": "number"
           }
         }
       }

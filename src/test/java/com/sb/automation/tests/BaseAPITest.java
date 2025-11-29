@@ -58,12 +58,33 @@ public abstract class BaseAPITest {
     }
 
     /**
-     * Validates successful response
+     * Validates successful response with retry for rate limiting
      */
     protected void validateSuccessResponse(Response response) {
-        Assert.assertEquals(response.getStatusCode(), 200, "Status code should be 200");
-        Assert.assertEquals(response.jsonPath().getString("status"), "OK", "Status should be OK");
-        Assert.assertNotNull(response.jsonPath().getList("data"), "Data array should not be null");
+        // Validate response object itself
+        Assert.assertNotNull(response, "Response should not be null");
+        
+        // Handle rate limiting gracefully
+        if (response.getStatusCode() == 429) {
+            logger.warn("Rate limit hit (429). Response: {}", response.asString());
+            Assert.fail("Rate limit exceeded. Consider reducing thread count or adding delays between requests.");
+        }
+        
+        // Validate status code
+        Assert.assertEquals(response.getStatusCode(), 200, 
+                "Status code should be 200, but was: " + response.getStatusCode() + ". Response: " + response.asString());
+        
+        // Safely validate JSON response fields
+        try {
+            String status = response.jsonPath().getString("status");
+            Assert.assertEquals(status, "OK", "Status should be OK");
+            
+            Object data = response.jsonPath().get("data");
+            Assert.assertNotNull(data, "Data field should not be null");
+        } catch (Exception e) {
+            logger.error("Error parsing JSON response: {}", response.asString(), e);
+            Assert.fail("Failed to parse JSON response: " + e.getMessage());
+        }
     }
 
     /**

@@ -1,0 +1,20 @@
+{
+  "valid_price_min": [0.01, 10.00, 50.50, 100.00, 500.00],
+  "valid_price_max": [100.00, 500.00, 1000.00, 5000.00, 10320.99],
+  "boundary_price_min": [0.01, 0.10, 1.00],
+  "boundary_price_max": [10.00, 100.00, 50000.00],
+  "invalid_prices": [-10.50, -1.00, 0.00, -100.00],
+  "valid_taxes": [0, 5, 10, 15, 20, 22, 25, 30],
+  "boundary_taxes": [0, 1, 99, 100],
+  "invalid_taxes": [-5, -10, 101, 150, -1],
+  "valid_categories_types": ["integer", "string", "uuid"],
+  "invalid_categories_types": ["boolean", "float", "invalid", "123", ""],
+  "price_ranges": [
+    {"min": 10.00, "max": 50.00},
+    {"min": 50.00, "max": 200.00},
+    {"min": 100.00, "max": 500.00},
+    {"min": 500.00, "max": 2000.00},
+    {"min": 1000.00, "max": 10000.00}
+  ]
+}
+
