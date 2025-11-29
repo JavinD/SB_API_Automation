@@ -1,307 +1,237 @@
 # Faker API Automation Framework
 
-A comprehensive Java-based API automation framework for testing the [FakerAPI.it](https://fakerapi.it/) REST APIs using REST Assured, TestNG, and JSON Schema validation.
+A Java-based API automation framework for testing [FakerAPI.it](https://fakerapi.it/) REST APIs using REST Assured, TestNG, and JSON Schema validation.
 
-## 📋 Table of Contents
+## Overview
 
-- [Overview](#overview)
-- [Features](#features)
-- [Project Structure](#project-structure)
-- [Prerequisites](#prerequisites)
-- [Setup and Installation](#setup-and-installation)
-- [Running Tests](#running-tests)
-- [Test Coverage](#test-coverage)
-- [Framework Architecture](#framework-architecture)
-- [Test Data](#test-data)
-- [Extending the Framework](#extending-the-framework)
+API automation framework for FakerAPI.it mock data generation APIs.
 
-## 🎯 Overview
+**Supported APIs:**
+- Addresses API (with `_country_code` parameter)
+- Books API
+- Products API (`_price_min`, `_price_max`, `_taxes`, `_categories_type`)
+- Images API (`_type`, `_width`, `_height` with dimension validation)
 
-This framework provides automated API testing for FakerAPI.it, which is a collection of free APIs that help developers generate mock data. The framework is designed with reusability, maintainability, and scalability in mind.
+## Demo Video
 
-Currently supports testing for:
-- **Addresses API** (with custom `_country_code` parameter)
-- **Books API**
+[View Demo Video](https://drive.google.com/file/d/1tNeZpMRsm_NgNWrQj26Th2tcDxD4iZNh/view?usp=drive_link) - Smoke test execution (13 tests in ~30-60 seconds)
 
-## ✨ Features
 
-- **Reusable Base Test Class**: Common test methods for all APIs with standard parameters (`_locale`, `_quantity`, `_seed`)
-- **Customized Test Classes**: API-specific test classes with custom parameter support
-- **JSON Schema Validation**: Automated response structure validation
-- **Data-Driven Testing**: TestNG data providers with external test data files
-- **Comprehensive Test Coverage**: 
-  - Default requests
-  - Boundary value testing
-  - Invalid input testing
-  - Locale variations
-  - Seed consistency testing
-  - Response structure validation
-- **Detailed Logging**: SLF4J logging for test execution tracking
-- **Maven Build System**: Easy dependency management and test execution
 
-## 📁 Project Structure
+## Features
+
+- Reusable base test class with common test methods
+- API-specific test classes with custom parameters
+- JSON Schema validation
+- Data-driven testing with TestNG
+- Parallel test execution (3 threads)
+- Image dimension validation using ImageIO
+- Comprehensive coverage: defaults, boundaries, invalid inputs, locales, seeds
+- Rate limiting handling
+- SLF4J logging
+- Maven build system
+
+## Project Structure
 
 ```
-faker-api-automation/
+SB_API_Automation/
 ├── src/
-│   ├── main/
-│   │   └── java/
-│   │       └── com/sb/automation/
-│   │           ├── config/
-│   │           │   └── APIConfig.java           # API configuration and constants
-│   │           └── utils/
-│   │               ├── APIClient.java           # REST API client with RequestBuilder
-│   │               ├── SchemaValidator.java     # JSON schema validation utilities
-│   │               └── TestDataReader.java      # Test data file reader
+│   ├── main/java/com/sb/automation/
+│   │   ├── config/APIConfig.java
+│   │   ├── models/APIResponse.java
+│   │   └── utils/
+│   │       ├── APIClient.java
+│   │       ├── SchemaValidator.java
+│   │       └── TestDataReader.java
 │   └── test/
-│       ├── java/
-│       │   └── com/sb/automation/tests/
-│       │       ├── BaseAPITest.java             # Base test class with reusable methods
-│       │       ├── AddressesAPITest.java        # Addresses API test class
-│       │       └── BooksAPITest.java            # Books API test class
+│       ├── java/com/sb/automation/tests/
+│       │   ├── BaseAPITest.java
+│       │   ├── AddressesAPITest.java (13 tests)
+│       │   ├── BooksAPITest.java (15 tests)
+│       │   ├── ProductsAPITest.java (25 tests)
+│       │   └── ImagesAPITest.java (22 tests)
 │       └── resources/
-│           ├── testdata/
-│           │   ├── locales.json                 # All available locales
-│           │   ├── quantities.json              # Valid and invalid quantities
-│           │   ├── seeds.json                   # Test seed values
-│           │   └── country_codes.json           # Country codes for addresses
-│           └── schemas/
-│               ├── addresses-schema.json        # JSON schema for addresses response
-│               └── books-schema.json            # JSON schema for books response
-├── pom.xml                                      # Maven dependencies
-├── testng.xml                                   # TestNG suite configuration
-├── .gitignore
-└── README.md
+│           ├── testdata/ (JSON test data files)
+│           └── schemas/ (JSON schema files)
+├── pom.xml
+├── testng.xml (default configuration)
+├── testng-fast.xml (fast execution)
+└── testng-smoke.xml (smoke tests only)
 ```
 
-## 🔧 Prerequisites
+## Prerequisites
 
-- **Java**: JDK 11 or higher
-- **Maven**: 3.6 or higher
-- **Internet Connection**: Required to access FakerAPI.it
+- Java JDK 11+
+- Apache Maven 3.6+
+- Internet connection
 
-## 🚀 Setup and Installation
+```bash
+java -version
+mvn -version
+```
 
-1. **Clone or navigate to the project directory**:
-   ```bash
-   cd d:\Javin\Job\SB\SB_API_Automation
-   ```
+## Installation
 
-2. **Install dependencies**:
-   ```bash
-   mvn clean install -DskipTests
-   ```
+### Windows
+1. Install JDK 11+ and set `JAVA_HOME`
+2. Install Maven and set `MAVEN_HOME`
+3. Add both to PATH
 
-3. **Verify installation**:
-   ```bash
-   mvn clean compile
-   ```
+### macOS
+```bash
+brew install openjdk@11 maven
+```
 
-## 🧪 Running Tests
+### Linux
+```bash
+sudo apt install openjdk-11-jdk maven
+```
 
-### Run All Tests
+## Setup
+
+```bash
+cd d:\Javin\Job\SB\SB_API_Automation\SB_API_Automation
+mvn clean install -DskipTests
+```
+
+## Running Tests
+
+**All tests:**
 ```bash
 mvn clean test
 ```
 
-### Run Specific Test Class
+**Smoke tests:**
 ```bash
-# Run Addresses API tests only
-mvn test -Dtest=AddressesAPITest
-
-# Run Books API tests only
-mvn test -Dtest=BooksAPITest
+mvn clean test "-DsuiteXmlFile=testng-smoke.xml"
 ```
 
-### Run Specific Test Method
+**Fast suite:**
 ```bash
-mvn test -Dtest=AddressesAPITest#testDefaultAddressesRequest
+mvn clean test "-DsuiteXmlFile=testng-fast.xml"
 ```
 
-### Run Tests with TestNG XML
+**Specific test class:**
 ```bash
-mvn clean test -DsuiteXmlFile=testng.xml
+mvn test -Dtest=ImagesAPITest
 ```
 
-### Generate Test Reports
-TestNG generates HTML reports automatically in:
-```
-target/surefire-reports/
-```
-
-## 📊 Test Coverage
-
-### Common Parameter Tests (All APIs)
-- ✅ Default request (no parameters)
-- ✅ Different locales (74 locales available)
-- ✅ Valid quantities (1, 5, 10, 50, 100, 500, 1000)
-- ✅ Boundary quantities (1 and 1000)
-- ✅ Invalid quantities (0, -1, 1001, 5000)
-- ✅ Seed consistency (same seed = same results)
-- ✅ All parameters combined
-- ✅ JSON schema validation
-
-### Addresses API Specific Tests
-- ✅ Valid country codes (US, GB, FR, DE, etc.)
-- ✅ Invalid country codes
-- ✅ Country code with locale combination
-- ✅ All parameters including country code
-- ✅ Data structure validation (10 fields)
-
-### Books API Specific Tests
-- ✅ Multiple seeds comparison
-- ✅ ISBN format validation
-- ✅ Response time validation
-- ✅ Locale impact on content
-- ✅ Total field accuracy
-- ✅ Data structure validation (9 fields)
-
-## 🏗️ Framework Architecture
-
-### 1. Base Test Class (`BaseAPITest`)
-Provides reusable test methods that all API test classes inherit:
-- `testDefaultRequest()`: Test API with default parameters
-- `testWithLocale()`: Test with specific locale
-- `testWithQuantity()`: Test with specific quantity
-- `testWithSeed()`: Test seed consistency
-- `testWithAllCommonParams()`: Test all parameters together
-- `validateSuccessResponse()`: Validate 200 OK response
-- `validateResponseQuantity()`: Validate response data count
-- `validateResponseSchema()`: Validate against JSON schema
-
-### 2. API Client (`APIClient`)
-- RESTful API client using REST Assured
-- Builder pattern for constructing requests
-- Support for common parameters (`_locale`, `_quantity`, `_seed`)
-- Custom parameter support via `withParam()`
-
-### 3. Test Data Management
-- JSON files for test data
-- `TestDataReader` utility for reading test data
-- Centralized test data management
-
-### 4. Schema Validation
-- JSON Schema validation using `json-schema-validator`
-- Separate schema files for each API endpoint
-- Validates response structure and data types
-
-## 📝 Test Data
-
-### Locales (`locales.json`)
-- **All Locales**: 74 supported locales
-- **Sample Locales**: 6 commonly used locales for quick testing
-- **Invalid Locales**: Test data for negative scenarios
-
-### Quantities (`quantities.json`)
-- **Valid Quantities**: 1, 5, 10, 50, 100, 500, 1000
-- **Boundary Quantities**: 1 (min), 1000 (max)
-- **Invalid Quantities**: 0, -1, 1001, 5000
-- **Edge Cases**: 999, 1000, 1001
-
-### Seeds (`seeds.json`)
-- **Valid Seeds**: Various integer seeds for consistency testing
-
-### Country Codes (`country_codes.json`)
-- **Valid Codes**: US, GB, FR, DE, IT, ES, JP, CN, IN, BR, CA, AU, MX, RU, ZA
-- **Invalid Codes**: XX, ZZ, "", "123", "USA", "invalid"
-
-## 🔄 Extending the Framework
-
-### Adding a New API Endpoint
-
-1. **Add endpoint constant to `APIConfig.java`**:
-```java
-public static final String NEW_ENDPOINT = "/newapi";
+**Specific test method:**
+```bash
+mvn test -Dtest=ImagesAPITest#testDefaultImagesRequest
 ```
 
-2. **Create JSON schema** in `src/test/resources/schemas/newapi-schema.json`
-
-3. **Create test data files** (if API has specific parameters)
-
-4. **Create test class extending `BaseAPITest`**:
-```java
-public class NewAPITest extends BaseAPITest {
-    @Override
-    protected String getEndpoint() {
-        return APIConfig.NEW_ENDPOINT;
-    }
-    
-    @Override
-    protected String getSchemaPath() {
-        return "src/test/resources/schemas/newapi-schema.json";
-    }
-    
-    // Add API-specific tests
-}
+**Custom thread count:**
+```bash
+mvn clean test "-DthreadCount=5"
 ```
 
-5. **Add to `testng.xml`**:
-```xml
-<class name="com.sb.automation.tests.NewAPITest"/>
+**View reports:** `target/surefire-reports/index.html`
+
+## Test Coverage
+
+| API | Tests | Special Features |
+|-----|-------|-----------------|
+| Addresses | 13 | Country code validation |
+| Books | 15 | ISBN format validation |
+| Products | 25 | Price/tax/category params |
+| Images | 22 | Image dimension validation |
+
+**Total: 75 tests** covering defaults, locales, quantities, boundaries, seeds, and schema validation.
+
+## Framework Architecture
+
+**Core Components:**
+1. **BaseAPITest** - Reusable test methods
+2. **APIClient** - REST client with builder pattern
+3. **TestDataReader** - JSON test data management
+4. **SchemaValidator** - JSON schema validation
+5. **APIConfig** - Centralized configuration
+
+## Test Data Files
+
+`src/test/resources/testdata/` contains:
+- `locales.json` - Locale variations
+- `quantities.json` - Valid/invalid quantities
+- `seeds.json` - Consistency test seeds
+- `country_codes.json` - Address country codes
+- `product_params.json` - Product parameters
+- `image_params.json` - Image dimensions
+
+## Parallel Execution
+
+Configured in `testng.xml` with `parallel="methods"` and `thread-count="3"`.
+
+**Performance:** Sequential (~8-10 min) vs Parallel (~2-3 min) = 3-5x faster
+
+Customize: `mvn clean test "-DthreadCount=5"`
+
+## Extending the Framework
+
+1. Add endpoint to `APIConfig.java`
+2. Create schema file: `src/test/resources/schemas/newapi-schema.json`
+3. Create test class extending `BaseAPITest`
+4. Add to `testng.xml`
+
+## Dependencies
+
+| Library | Version | Purpose |
+|---------|---------|---------|
+| REST Assured | 5.3.2 | API testing |
+| TestNG | 7.8.0 | Test framework |
+| Jackson | 2.15.3 | JSON processing |
+| JSON Schema Validator | 5.3.2 | Schema validation |
+| SLF4J | 2.0.9 | Logging |
+
+## Troubleshooting
+
+**Build failures:**
+```bash
+mvn clean install -DskipTests -U
 ```
 
-### Adding Custom Parameters
-
-Use the `RequestBuilder.withParam()` method:
-```java
-Response response = new APIClient.RequestBuilder(endpoint)
-    .withLocale("en_US")
-    .withQuantity(10)
-    .withParam("_custom_param", "value")
-    .execute();
+**Rate limiting (429 errors):**
+```bash
+mvn clean test "-DthreadCount=2"
 ```
 
-## 📚 Dependencies
+**Network issues:**
+- Check internet connection
+- Verify https://fakerapi.it is accessible
 
-- **REST Assured**: 5.3.2 - REST API testing
-- **TestNG**: 7.8.0 - Test framework
-- **Jackson**: 2.15.3 - JSON processing
-- **JSON Schema Validator**: 5.3.2 - Schema validation
-- **SLF4J**: 2.0.9 - Logging
-- **Lombok**: 1.18.30 - Code generation (optional)
+**Schema validation errors:**
+- Verify schema files exist in `src/test/resources/schemas/`
+- Check schema matches API response
 
-## 🎓 Best Practices
+## API Reference
 
-1. **Reusability**: Common test logic in `BaseAPITest`
-2. **Data-Driven**: TestNG data providers with external data files
-3. **Maintainability**: Centralized configuration in `APIConfig`
-4. **Validation**: Multi-level validation (status code, structure, schema)
-5. **Logging**: Comprehensive logging for debugging
-6. **Separation of Concerns**: Utils, config, tests in separate packages
+**Base URL:** `https://fakerapi.it/api/v2`
 
-## 📧 API Reference
+**Common Parameters:**
+- `_locale` - Language locale (default: en_US)
+- `_quantity` - Number of records 1-1000 (default: 10)
+- `_seed` - Integer seed for consistency (default: null)
 
-Base URL: `https://fakerapi.it/api/v2`
+**Endpoints:**
 
-### Common Parameters
-- `_locale`: Language/locale (e.g., en_US, fr_FR) - Default: en_US
-- `_quantity`: Number of records (1-1000) - Default: 10
-- `_seed`: Integer seed for consistent results - Default: null
+1. **Addresses:** `/addresses`
+   - Additional: `_country_code` (e.g., US, GB, FR)
 
-### Addresses Endpoint
-```
-GET /addresses
-Additional Parameter: _country_code (e.g., US, GB, FR)
-```
+2. **Books:** `/books`
+   - No additional parameters
 
-### Books Endpoint
-```
-GET /books
-No additional parameters
-```
+3. **Products:** `/products`
+   - `_price_min` - Minimum price (default: 0.01)
+   - `_price_max` - Maximum price (default: none)
+   - `_taxes` - Tax percentage (default: 22)
+   - `_categories_type` - integer|string|uuid (default: integer)
 
-## 🐛 Troubleshooting
+4. **Images:** `/images`
+   - `_type` - any|pokemon (default: any)
+   - `_width` - Width in pixels (default: 640)
+   - `_height` - Height in pixels (default: 480)
 
-1. **Build Failures**: Run `mvn clean install -DskipTests`
-2. **Test Failures**: Check network connection to fakerapi.it
-3. **Schema Validation Errors**: Verify schema files exist and are valid JSON
-4. **Data Provider Errors**: Ensure test data JSON files are properly formatted
-
-## 📄 License
-
-This project is created for educational and testing purposes.
-
-## 🔗 Resources
+## Resources
 
 - [FakerAPI Documentation](https://fakerapi.it/)
 - [REST Assured Documentation](https://rest-assured.io/)
@@ -310,6 +240,5 @@ This project is created for educational and testing purposes.
 
 ---
 
-**Created by**: SB API Automation Team  
-**Last Updated**: November 2025
-
+**Last Updated:** November 2025  
+**Total Tests:** 75 comprehensive test cases across 4 APIs
