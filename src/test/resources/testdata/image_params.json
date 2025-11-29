@@ -1,0 +1,15 @@
+{
+  "valid_types": ["any", "pokemon"],
+  "invalid_types": ["invalid", "person", "animal", "", "123"],
+  "valid_widths": [100, 320, 500, 640, 800, 1024, 1920],
+  "valid_heights": [100, 240, 360, 480, 600, 768, 1080],
+  "boundary_widths": [1, 50, 100, 2000, 4000],
+  "boundary_heights": [1, 50, 100, 2000, 4000],
+  "invalid_dimensions": [0, -1, -100],
+  "dimension_combinations": [
+    {"width": 640, "height": 480},
+    {"width": 800, "height": 600},
+    {"width": 1024, "height": 768}
+  ]
+}
+

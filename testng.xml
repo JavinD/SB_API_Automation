@@ -6,6 +6,7 @@
             <class name="com.sb.automation.tests.AddressesAPITest"/>
             <class name="com.sb.automation.tests.BooksAPITest"/>
             <class name="com.sb.automation.tests.ProductsAPITest"/>
+            <class name="com.sb.automation.tests.ImagesAPITest"/>
         </classes>
     </test>
 </suite>

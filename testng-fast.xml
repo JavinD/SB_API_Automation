@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
 <!-- Maximum speed configuration - runs all tests with maximum parallelization -->
-<suite name="Faker API Test Suite - High Performance" parallel="methods" thread-count="5" verbose="1">
+<suite name="Faker API Test Suite - High Performance" parallel="methods" thread-count="3" verbose="1">
     <test name="Faker API Tests">
         <classes>
             <class name="com.sb.automation.tests.AddressesAPITest"/>
             <class name="com.sb.automation.tests.BooksAPITest"/>
             <class name="com.sb.automation.tests.ProductsAPITest"/>
+            <class name="com.sb.automation.tests.ImagesAPITest"/>
         </classes>
     </test>
 </suite>
