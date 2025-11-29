@@ -1,0 +1,28 @@
+{
+  "valid_country_codes": [
+    "US",
+    "GB",
+    "FR",
+    "DE",
+    "IT",
+    "ES",
+    "JP",
+    "CN",
+    "IN",
+    "BR",
+    "CA",
+    "AU",
+    "MX",
+    "RU",
+    "ZA"
+  ],
+  "invalid_country_codes": [
+    "XX",
+    "ZZ",
+    "",
+    "123",
+    "USA",
+    "invalid"
+  ]
+}
+

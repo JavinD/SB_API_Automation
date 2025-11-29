@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["status", "code", "total", "data"],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["OK", "ERROR"]
+    },
+    "code": {
+      "type": "integer"
+    },
+    "total": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "author", "genre", "description", "isbn", "image", "published", "publisher"],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "genre": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "isbn": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "published": {
+            "type": "string"
+          },
+          "publisher": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
+

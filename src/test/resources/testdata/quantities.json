@@ -1,0 +1,27 @@
+{
+  "valid_quantities": [
+    1,
+    5,
+    10,
+    50,
+    100,
+    500,
+    1000
+  ],
+  "boundary_quantities": [
+    1,
+    1000
+  ],
+  "invalid_quantities": [
+    0,
+    -1,
+    1001,
+    5000
+  ],
+  "edge_case_quantities": [
+    999,
+    1000,
+    1001
+  ]
+}
+

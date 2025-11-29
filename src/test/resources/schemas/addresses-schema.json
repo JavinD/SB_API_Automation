@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["status", "code", "total", "data"],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["OK", "ERROR"]
+    },
+    "code": {
+      "type": "integer"
+    },
+    "total": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "street", "streetName", "buildingNumber", "city", "zipcode", "country", "county_code", "latitude", "longitude"],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "street": {
+            "type": "string"
+          },
+          "streetName": {
+            "type": "string"
+          },
+          "buildingNumber": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "zipcode": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "county_code": {
+            "type": "string"
+          },
+          "latitude": {
+            "type": "number"
+          },
+          "longitude": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}
+
