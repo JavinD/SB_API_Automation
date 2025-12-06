@@ -2,9 +2,6 @@ package com.sb.automation.models;
 
 import lombok.Data;
 
-/**
- * Book model representing the response data from /books endpoint
- */
 @Data
 public class Book {
     private int id;
@@ -17,4 +14,3 @@ public class Book {
     private String published;
     private String publisher;
 }
-

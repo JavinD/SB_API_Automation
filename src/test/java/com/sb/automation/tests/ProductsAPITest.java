@@ -11,11 +11,6 @@ import org.testng.annotations.Test;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Test class for Products API
- * Includes tests for common parameters and product-specific parameters
- * Product-specific params: _price_min, _price_max, _taxes, _categories_type
- */
 public class ProductsAPITest extends BaseAPITest {
     
     private static final String PRODUCT_PARAMS_DATA = "src/test/resources/testdata/product_params.json";
@@ -44,7 +39,6 @@ public class ProductsAPITest extends BaseAPITest {
     @BeforeClass
     @SuppressWarnings("unchecked")
     public void setup() {
-        logger.info("Setting up Products API tests");
         validPriceMin = TestDataReader.getTestDataList(PRODUCT_PARAMS_DATA, "valid_price_min");
         validPriceMax = TestDataReader.getTestDataList(PRODUCT_PARAMS_DATA, "valid_price_max");
         boundaryPriceMin = TestDataReader.getTestDataList(PRODUCT_PARAMS_DATA, "boundary_price_min");
@@ -58,113 +52,70 @@ public class ProductsAPITest extends BaseAPITest {
         priceRanges = TestDataReader.getTestDataList(PRODUCT_PARAMS_DATA, "price_ranges");
     }
 
-    // ============= Common Parameter Tests =============
-
-    @Test(priority = 1, description = "Test default products API request")
+    @Test(priority = 1)
     public void testDefaultProductsRequest() {
-        logger.info("Executing: testDefaultProductsRequest");
         Response response = testDefaultRequest();
-        
-        // Validate default quantity (10)
         validateResponseQuantity(response, 10);
-        
-        logger.info("testDefaultProductsRequest - PASSED");
     }
 
-    @Test(priority = 2, description = "Test products API with schema validation")
+    @Test(priority = 2)
     public void testProductsSchemaValidation() {
-        logger.info("Executing: testProductsSchemaValidation");
-        
         Response response = new APIClient.RequestBuilder(getEndpoint())
                 .withQuantity(5)
                 .execute();
         
         validateSuccessResponse(response);
         validateResponseSchema(response);
-        
-        logger.info("testProductsSchemaValidation - PASSED");
     }
 
-    @Test(priority = 3, description = "Test products API with different locales", dataProvider = "getLocales")
+    @Test(priority = 3, dataProvider = "getLocales")
     public void testProductsWithDifferentLocales(String locale) {
-        logger.info("Executing: testProductsWithDifferentLocales with locale: {}", locale);
-        
         Response response = testWithLocale(locale);
         validateResponseQuantity(response, 10);
-        
-        logger.info("testProductsWithDifferentLocales - PASSED for locale: {}", locale);
     }
 
-    @Test(priority = 4, description = "Test products API with valid quantities", dataProvider = "getValidQuantities")
+    @Test(priority = 4, dataProvider = "getValidQuantities")
     public void testProductsWithValidQuantities(int quantity) {
-        logger.info("Executing: testProductsWithValidQuantities with quantity: {}", quantity);
-        
         Response response = testWithQuantity(quantity);
         validateSuccessResponse(response);
         validateResponseQuantity(response, quantity);
-        
-        logger.info("testProductsWithValidQuantities - PASSED for quantity: {}", quantity);
     }
 
-    @Test(priority = 5, description = "Test products API with boundary quantities")
+    @Test(priority = 5)
     public void testProductsWithBoundaryQuantities() {
-        logger.info("Executing: testProductsWithBoundaryQuantities");
-        
-        // Test minimum quantity (1)
         Response response1 = testWithQuantity(1);
         validateSuccessResponse(response1);
         validateResponseQuantity(response1, 1);
         
-        // Test maximum quantity (1000)
         Response response2 = testWithQuantity(1000);
         validateSuccessResponse(response2);
         validateResponseQuantity(response2, 1000);
-        
-        logger.info("testProductsWithBoundaryQuantities - PASSED");
     }
 
-    @Test(priority = 6, description = "Test products API with invalid quantities", dataProvider = "getInvalidQuantities")
+    @Test(priority = 6, dataProvider = "getInvalidQuantities")
     public void testProductsWithInvalidQuantities(int quantity) {
-        logger.info("Executing: testProductsWithInvalidQuantities with quantity: {}", quantity);
-        
         Response response = testWithQuantity(quantity);
-        
-        // Document the actual API behavior for invalid quantities
-        logger.info("Response for invalid quantity {}: Status={}, Body={}", 
-                quantity, response.getStatusCode(), response.asString());
+        logger.info("Invalid quantity {}: status={}", quantity, response.getStatusCode());
     }
 
-    @Test(priority = 7, description = "Test products API with seed for consistency")
+    @Test(priority = 7)
     public void testProductsWithSeed() {
-        logger.info("Executing: testProductsWithSeed");
-        
         int testSeed = ((Number) testSeeds.get(0)).intValue();
         Response response = testWithSeed(testSeed);
         validateSuccessResponse(response);
-        
-        logger.info("testProductsWithSeed - PASSED");
     }
 
-    @Test(priority = 8, description = "Test products API with all common parameters")
+    @Test(priority = 8)
     public void testProductsWithAllCommonParameters() {
-        logger.info("Executing: testProductsWithAllCommonParameters");
-        
         String locale = sampleLocales.get(0);
-        int quantity = 25;
         int seed = ((Number) testSeeds.get(0)).intValue();
         
-        Response response = testWithAllCommonParams(locale, quantity, seed);
+        Response response = testWithAllCommonParams(locale, 25, seed);
         validateResponseSchema(response);
-        
-        logger.info("testProductsWithAllCommonParameters - PASSED");
     }
 
-    // ============= Product-Specific Parameter Tests: Price Min =============
-
-    @Test(priority = 9, description = "Test products API with valid price_min values", dataProvider = "getValidPriceMin")
+    @Test(priority = 9, dataProvider = "getValidPriceMin")
     public void testProductsWithValidPriceMin(double priceMin) {
-        logger.info("Executing: testProductsWithValidPriceMin with price_min: {}", priceMin);
-        
         Response response = new APIClient.RequestBuilder(getEndpoint())
                 .withQuantity(10)
                 .withParam("_price_min", String.valueOf(priceMin))
@@ -172,21 +123,16 @@ public class ProductsAPITest extends BaseAPITest {
         
         validateSuccessResponse(response);
         
-        // Verify all products have price >= priceMin
         List<Map<String, Object>> products = response.jsonPath().getList("data");
         for (Map<String, Object> product : products) {
             double actualPrice = ((Number) product.get("price")).doubleValue();
             Assert.assertTrue(actualPrice >= priceMin,
-                    String.format("Product price %.2f should be >= price_min %.2f", actualPrice, priceMin));
+                    String.format("Price %.2f should be >= %.2f", actualPrice, priceMin));
         }
-        
-        logger.info("testProductsWithValidPriceMin - PASSED for price_min: {}", priceMin);
     }
 
-    @Test(priority = 10, description = "Test products API with boundary price_min values")
+    @Test(priority = 10)
     public void testProductsWithBoundaryPriceMin() {
-        logger.info("Executing: testProductsWithBoundaryPriceMin");
-        
         for (Object priceMinObj : boundaryPriceMin) {
             double priceMin = ((Number) priceMinObj).doubleValue();
             
@@ -196,42 +142,30 @@ public class ProductsAPITest extends BaseAPITest {
                     .execute();
             
             validateSuccessResponse(response);
-            logger.info("Boundary price_min {} - PASSED", priceMin);
         }
-        
-        logger.info("testProductsWithBoundaryPriceMin - PASSED");
     }
 
-    // ============= Product-Specific Parameter Tests: Price Max =============
-
-    @Test(priority = 11, description = "Test products API with valid price_max values", dataProvider = "getValidPriceMax")
+    @Test(priority = 11, dataProvider = "getValidPriceMax")
     public void testProductsWithValidPriceMax(double priceMax) {
-        logger.info("Executing: testProductsWithValidPriceMax with price_max: {}", priceMax);
-        
         Response response = new APIClient.RequestBuilder(getEndpoint())
                 .withQuantity(10)
                 .withParam("_price_max", String.valueOf(priceMax))
-                .withParam("_taxes", "0")  // Set taxes to 0 to get base prices
+                .withParam("_taxes", "0")
                 .execute();
         
         validateSuccessResponse(response);
         
-        // Verify all products have price <= priceMax (with tolerance for taxes)
         List<Map<String, Object>> products = response.jsonPath().getList("data");
         for (Map<String, Object> product : products) {
             double actualPrice = ((Number) product.get("price")).doubleValue();
-            double tolerance = priceMax * 0.25;  // 25% tolerance for taxes
+            double tolerance = priceMax * 0.25;
             Assert.assertTrue(actualPrice <= priceMax + tolerance,
-                    String.format("Product price %.2f should be <= price_max %.2f (with tolerance)", actualPrice, priceMax));
+                    String.format("Price %.2f should be <= %.2f", actualPrice, priceMax));
         }
-        
-        logger.info("testProductsWithValidPriceMax - PASSED for price_max: {}", priceMax);
     }
 
-    @Test(priority = 12, description = "Test products API with boundary price_max values")
+    @Test(priority = 12)
     public void testProductsWithBoundaryPriceMax() {
-        logger.info("Executing: testProductsWithBoundaryPriceMax");
-        
         for (Object priceMaxObj : boundaryPriceMax) {
             double priceMax = ((Number) priceMaxObj).doubleValue();
             
@@ -241,89 +175,60 @@ public class ProductsAPITest extends BaseAPITest {
                     .execute();
             
             validateSuccessResponse(response);
-            logger.info("Boundary price_max {} - PASSED", priceMax);
         }
-        
-        logger.info("testProductsWithBoundaryPriceMax - PASSED");
     }
 
-    // ============= Product-Specific Parameter Tests: Price Range =============
-
-    @Test(priority = 13, description = "Test products API with price range (min and max)", dataProvider = "getPriceRanges")
+    @Test(priority = 13, dataProvider = "getPriceRanges")
     public void testProductsWithPriceRange(double priceMin, double priceMax) {
-        logger.info("Executing: testProductsWithPriceRange with price_min: {} and price_max: {}", priceMin, priceMax);
-        
         Response response = new APIClient.RequestBuilder(getEndpoint())
                 .withQuantity(20)
                 .withParam("_price_min", String.valueOf(priceMin))
                 .withParam("_price_max", String.valueOf(priceMax))
-                .withParam("_taxes", "0")  // Set taxes to 0 to get base prices
+                .withParam("_taxes", "0")
                 .execute();
         
         validateSuccessResponse(response);
         
-        // Verify all products have price within range (with 10% tolerance for taxes)
         List<Map<String, Object>> products = response.jsonPath().getList("data");
         for (Map<String, Object> product : products) {
             double actualPrice = ((Number) product.get("price")).doubleValue();
-            // Allow for some tolerance due to taxes or rounding
-            double tolerance = priceMax * 0.25;  // 25% tolerance for taxes
+            double tolerance = priceMax * 0.25;
             Assert.assertTrue(actualPrice >= priceMin * 0.95 && actualPrice <= priceMax + tolerance,
-                    String.format("Product price %.2f should be approximately between %.2f and %.2f (with tolerance)", 
-                            actualPrice, priceMin, priceMax));
+                    String.format("Price %.2f outside range [%.2f, %.2f]", actualPrice, priceMin, priceMax));
         }
-        
-        logger.info("testProductsWithPriceRange - PASSED for range [{}, {}]", priceMin, priceMax);
     }
 
-    @Test(priority = 14, description = "Test products API with invalid price values", dataProvider = "getInvalidPrices")
+    @Test(priority = 14, dataProvider = "getInvalidPrices")
     public void testProductsWithInvalidPrices(double invalidPrice) {
-        logger.info("Executing: testProductsWithInvalidPrices with price: {}", invalidPrice);
-        
         Response response = new APIClient.RequestBuilder(getEndpoint())
                 .withQuantity(5)
                 .withParam("_price_min", String.valueOf(invalidPrice))
                 .execute();
         
-        // Document the actual API behavior for invalid prices
-        logger.info("Response for invalid price {}: Status={}, Body={}", 
-                invalidPrice, response.getStatusCode(), response.asString());
+        logger.info("Invalid price {}: status={}", invalidPrice, response.getStatusCode());
     }
 
-    // ============= Product-Specific Parameter Tests: Taxes =============
-
-    @Test(priority = 15, description = "Test products API with valid tax values", dataProvider = "getValidTaxes")
+    @Test(priority = 15, dataProvider = "getValidTaxes")
     public void testProductsWithValidTaxes(int taxes) {
-        logger.info("Executing: testProductsWithValidTaxes with taxes: {}%", taxes);
-        
         Response response = new APIClient.RequestBuilder(getEndpoint())
                 .withQuantity(10)
                 .withParam("_taxes", String.valueOf(taxes))
                 .execute();
         
         validateSuccessResponse(response);
-        
-        logger.info("testProductsWithValidTaxes - PASSED for taxes: {}%", taxes);
     }
 
-    @Test(priority = 16, description = "Test products API with default tax value (22%)")
+    @Test(priority = 16)
     public void testProductsWithDefaultTax() {
-        logger.info("Executing: testProductsWithDefaultTax");
-        
-        // Request without taxes parameter (should use default 22%)
         Response response = new APIClient.RequestBuilder(getEndpoint())
                 .withQuantity(5)
                 .execute();
         
         validateSuccessResponse(response);
-        
-        logger.info("testProductsWithDefaultTax - PASSED");
     }
 
-    @Test(priority = 17, description = "Test products API with boundary tax values")
+    @Test(priority = 17)
     public void testProductsWithBoundaryTaxes() {
-        logger.info("Executing: testProductsWithBoundaryTaxes");
-        
         for (Object taxObj : boundaryTaxes) {
             int tax = ((Number) taxObj).intValue();
             
@@ -333,32 +238,21 @@ public class ProductsAPITest extends BaseAPITest {
                     .execute();
             
             validateSuccessResponse(response);
-            logger.info("Boundary tax {}% - PASSED", tax);
         }
-        
-        logger.info("testProductsWithBoundaryTaxes - PASSED");
     }
 
-    @Test(priority = 18, description = "Test products API with invalid tax values", dataProvider = "getInvalidTaxes")
+    @Test(priority = 18, dataProvider = "getInvalidTaxes")
     public void testProductsWithInvalidTaxes(int taxes) {
-        logger.info("Executing: testProductsWithInvalidTaxes with taxes: {}%", taxes);
-        
         Response response = new APIClient.RequestBuilder(getEndpoint())
                 .withQuantity(5)
                 .withParam("_taxes", String.valueOf(taxes))
                 .execute();
         
-        // Document the actual API behavior for invalid taxes
-        logger.info("Response for invalid taxes {}: Status={}, Body={}", 
-                taxes, response.getStatusCode(), response.asString());
+        logger.info("Invalid taxes {}: status={}", taxes, response.getStatusCode());
     }
 
-    // ============= Product-Specific Parameter Tests: Categories Type =============
-
-    @Test(priority = 19, description = "Test products API with valid categories types", dataProvider = "getValidCategoriesTypes")
+    @Test(priority = 19, dataProvider = "getValidCategoriesTypes")
     public void testProductsWithValidCategoriesTypes(String categoryType) {
-        logger.info("Executing: testProductsWithValidCategoriesTypes with type: {}", categoryType);
-        
         Response response = new APIClient.RequestBuilder(getEndpoint())
                 .withQuantity(10)
                 .withParam("_categories_type", categoryType)
@@ -366,234 +260,154 @@ public class ProductsAPITest extends BaseAPITest {
         
         validateSuccessResponse(response);
         
-        // Verify category type in response - categories is an array
         List<Map<String, Object>> products = response.jsonPath().getList("data");
         for (Map<String, Object> product : products) {
             Object categoriesObj = product.get("categories");
-            Assert.assertNotNull(categoriesObj, "Product should have a categories field");
-            Assert.assertTrue(categoriesObj instanceof List, "Categories should be an array");
+            Assert.assertNotNull(categoriesObj);
+            Assert.assertTrue(categoriesObj instanceof List);
             
             @SuppressWarnings("unchecked")
             List<Object> categories = (List<Object>) categoriesObj;
-            Assert.assertFalse(categories.isEmpty(), "Categories array should not be empty");
+            Assert.assertFalse(categories.isEmpty());
             
-            // Validate each category element type
             for (Object category : categories) {
                 switch (categoryType) {
                     case "integer":
-                        Assert.assertTrue(category instanceof Integer || category instanceof Number,
-                                "Category element should be an integer for type: " + categoryType + ", but got: " + category.getClass().getSimpleName());
+                        Assert.assertTrue(category instanceof Integer || category instanceof Number);
                         break;
                     case "string":
-                        Assert.assertTrue(category instanceof String,
-                                "Category element should be a string for type: " + categoryType + ", but got: " + category.getClass().getSimpleName());
-                        // Verify it's NOT a UUID format for plain string type
+                        Assert.assertTrue(category instanceof String);
                         String str = (String) category;
-                        Assert.assertFalse(str.matches("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"),
-                                "Category should be a plain string, not UUID format");
+                        Assert.assertFalse(str.matches("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"));
                         break;
                     case "uuid":
-                        Assert.assertTrue(category instanceof String,
-                                "Category element should be a UUID string for type: " + categoryType + ", but got: " + category.getClass().getSimpleName());
-                        // Verify UUID format
+                        Assert.assertTrue(category instanceof String);
                         String uuid = (String) category;
-                        Assert.assertTrue(uuid.matches("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"),
-                                "Category should match UUID format: " + uuid);
+                        Assert.assertTrue(uuid.matches("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"));
                         break;
                 }
             }
         }
-        
-        logger.info("testProductsWithValidCategoriesTypes - PASSED for type: {}", categoryType);
     }
 
-    @Test(priority = 20, description = "Test products API with default categories type (integer)")
+    @Test(priority = 20)
     public void testProductsWithDefaultCategoriesType() {
-        logger.info("Executing: testProductsWithDefaultCategoriesType");
-        
-        // Request without categories_type parameter (should use default integer)
         Response response = new APIClient.RequestBuilder(getEndpoint())
                 .withQuantity(5)
                 .execute();
         
         validateSuccessResponse(response);
         
-        // Verify default type is integer - categories is an array
         List<Map<String, Object>> products = response.jsonPath().getList("data");
         for (Map<String, Object> product : products) {
             Object categoriesObj = product.get("categories");
-            Assert.assertNotNull(categoriesObj, "Product should have a categories field");
-            Assert.assertTrue(categoriesObj instanceof List, "Categories should be an array");
+            Assert.assertNotNull(categoriesObj);
+            Assert.assertTrue(categoriesObj instanceof List);
             
             @SuppressWarnings("unchecked")
             List<Object> categories = (List<Object>) categoriesObj;
-            Assert.assertFalse(categories.isEmpty(), "Categories array should not be empty");
+            Assert.assertFalse(categories.isEmpty());
             
-            // Verify each element is an integer
             for (Object category : categories) {
-                Assert.assertTrue(category instanceof Integer || category instanceof Number,
-                        "Default category type should be integer, but got: " + category.getClass().getSimpleName());
+                Assert.assertTrue(category instanceof Integer || category instanceof Number);
             }
         }
-        
-        logger.info("testProductsWithDefaultCategoriesType - PASSED");
     }
 
-    @Test(priority = 21, description = "Test products API with invalid categories types", dataProvider = "getInvalidCategoriesTypes")
+    @Test(priority = 21, dataProvider = "getInvalidCategoriesTypes")
     public void testProductsWithInvalidCategoriesTypes(String categoryType) {
-        logger.info("Executing: testProductsWithInvalidCategoriesTypes with type: {}", categoryType);
-        
         Response response = new APIClient.RequestBuilder(getEndpoint())
                 .withQuantity(5)
                 .withParam("_categories_type", categoryType)
                 .execute();
         
-        // Document the actual API behavior for invalid category types
-        logger.info("Response for invalid category type '{}': Status={}, Body={}", 
-                categoryType, response.getStatusCode(), response.asString());
+        logger.info("Invalid category type '{}': status={}", categoryType, response.getStatusCode());
     }
 
-    // ============= Product-Specific Combined Parameter Tests =============
-
-    @Test(priority = 22, description = "Test products API with all product-specific parameters")
+    @Test(priority = 22)
     public void testProductsWithAllSpecificParameters() {
-        logger.info("Executing: testProductsWithAllSpecificParameters");
-        
-        double priceMin = 50.00;
-        double priceMax = 500.00;
-        int taxes = 10;
-        String categoryType = "uuid";
-        
         Response response = new APIClient.RequestBuilder(getEndpoint())
                 .withQuantity(20)
-                .withParam("_price_min", String.valueOf(priceMin))
-                .withParam("_price_max", String.valueOf(priceMax))
-                .withParam("_taxes", String.valueOf(taxes))
-                .withParam("_categories_type", categoryType)
+                .withParam("_price_min", "50.00")
+                .withParam("_price_max", "500.00")
+                .withParam("_taxes", "10")
+                .withParam("_categories_type", "uuid")
                 .execute();
         
         validateSuccessResponse(response);
         validateResponseQuantity(response, 20);
         
-        // Verify price range (with tolerance for taxes)
         List<Map<String, Object>> products = response.jsonPath().getList("data");
         for (Map<String, Object> product : products) {
             double actualPrice = ((Number) product.get("price")).doubleValue();
-            double tolerance = priceMax * 0.25;  // 25% tolerance for taxes
-            Assert.assertTrue(actualPrice >= priceMin * 0.95 && actualPrice <= priceMax + tolerance,
-                    String.format("Product price %.2f should be approximately between %.2f and %.2f", 
-                            actualPrice, priceMin, priceMax));
-            
-            // Verify UUID format - categories is an array
-            Object categoriesObj = product.get("categories");
-            Assert.assertNotNull(categoriesObj, "Product should have a categories field");
-            Assert.assertTrue(categoriesObj instanceof List, "Categories should be an array");
+            Assert.assertTrue(actualPrice >= 47.5 && actualPrice <= 625.0);
             
             @SuppressWarnings("unchecked")
-            List<Object> categories = (List<Object>) categoriesObj;
-            Assert.assertFalse(categories.isEmpty(), "Categories array should not be empty");
+            List<Object> categories = (List<Object>) product.get("categories");
+            Assert.assertFalse(categories.isEmpty());
             
-            // Verify each element is a UUID string
             for (Object category : categories) {
-                Assert.assertTrue(category instanceof String, 
-                        "Category element should be a string for UUID type, but got: " + category.getClass().getSimpleName());
+                Assert.assertTrue(category instanceof String);
                 String uuid = (String) category;
-                Assert.assertTrue(uuid.matches("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"),
-                        "Category should match UUID format: " + uuid);
+                Assert.assertTrue(uuid.matches("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"));
             }
         }
-        
-        logger.info("testProductsWithAllSpecificParameters - PASSED");
     }
 
-    @Test(priority = 23, description = "Test products API with all parameters including common ones")
+    @Test(priority = 23)
     public void testProductsWithAllParameters() {
-        logger.info("Executing: testProductsWithAllParameters");
-        
-        String locale = "en_US";
-        int quantity = 30;
-        int seed = 54321;
-        double priceMin = 20.00;
-        double priceMax = 1000.00;
-        int taxes = 15;
-        String categoryType = "string";
-        
         Response response = new APIClient.RequestBuilder(getEndpoint())
-                .withLocale(locale)
-                .withQuantity(quantity)
-                .withSeed(seed)
-                .withParam("_price_min", String.valueOf(priceMin))
-                .withParam("_price_max", String.valueOf(priceMax))
-                .withParam("_taxes", String.valueOf(taxes))
-                .withParam("_categories_type", categoryType)
+                .withLocale("en_US")
+                .withQuantity(30)
+                .withSeed(54321)
+                .withParam("_price_min", "20.00")
+                .withParam("_price_max", "1000.00")
+                .withParam("_taxes", "15")
+                .withParam("_categories_type", "string")
                 .execute();
         
         validateSuccessResponse(response);
-        validateResponseQuantity(response, quantity);
+        validateResponseQuantity(response, 30);
         validateResponseSchema(response);
-        
-        logger.info("testProductsWithAllParameters - PASSED");
     }
 
-    // ============= Product-Specific Data Structure Tests =============
-
-    @Test(priority = 24, description = "Test products data structure and fields")
+    @Test(priority = 24)
     public void testProductsDataStructure() {
-        logger.info("Executing: testProductsDataStructure");
-        
         Response response = new APIClient.RequestBuilder(getEndpoint())
                 .withQuantity(1)
                 .execute();
         
         validateSuccessResponse(response);
         
-        // Verify product fields
         Map<String, Object> product = response.jsonPath().getMap("data[0]");
         
-        Assert.assertNotNull(product.get("id"), "Product should have id");
-        Assert.assertNotNull(product.get("name"), "Product should have name");
-        Assert.assertNotNull(product.get("description"), "Product should have description");
-        Assert.assertNotNull(product.get("price"), "Product should have price");
-        Assert.assertNotNull(product.get("categories"), "Product should have categories");
-        Assert.assertNotNull(product.get("ean"), "Product should have ean");
-        Assert.assertNotNull(product.get("image"), "Product should have image");
+        Assert.assertNotNull(product.get("id"));
+        Assert.assertNotNull(product.get("name"));
+        Assert.assertNotNull(product.get("description"));
+        Assert.assertNotNull(product.get("price"));
+        Assert.assertNotNull(product.get("categories"));
+        Assert.assertNotNull(product.get("ean"));
+        Assert.assertNotNull(product.get("image"));
         
-        // Verify categories is an array
-        Object categoriesObj = product.get("categories");
-        Assert.assertTrue(categoriesObj instanceof List, "Categories should be an array");
-        
-        // Log all fields to see actual structure
-        logger.info("Product data: {}", product);
-        logger.info("Available fields: {}", product.keySet());
-        logger.info("testProductsDataStructure - PASSED");
+        Assert.assertTrue(product.get("categories") instanceof List);
     }
 
-    @Test(priority = 25, description = "Test products price format")
+    @Test(priority = 25)
     public void testProductsPriceFormat() {
-        logger.info("Executing: testProductsPriceFormat");
-        
         Response response = new APIClient.RequestBuilder(getEndpoint())
                 .withQuantity(10)
                 .execute();
         
         validateSuccessResponse(response);
         
-        // Verify price format (should be a positive number)
         List<Map<String, Object>> products = response.jsonPath().getList("data");
         for (Map<String, Object> product : products) {
             Object priceObj = product.get("price");
-            Assert.assertNotNull(priceObj, "Price should not be null");
-            
+            Assert.assertNotNull(priceObj);
             double price = ((Number) priceObj).doubleValue();
-            Assert.assertTrue(price > 0, "Price should be positive");
-            
-            logger.debug("Product: {}, Price: {}", product.get("name"), price);
+            Assert.assertTrue(price > 0);
         }
-        
-        logger.info("testProductsPriceFormat - PASSED");
     }
-
-    // ============= Data Providers =============
 
     @org.testng.annotations.DataProvider(name = "getLocales")
     public Object[][] getLocales() {
@@ -678,4 +492,3 @@ public class ProductsAPITest extends BaseAPITest {
                 .toArray(Object[][]::new);
     }
 }
-

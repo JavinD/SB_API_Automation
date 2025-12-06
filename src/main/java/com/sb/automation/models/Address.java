@@ -3,9 +3,6 @@ package com.sb.automation.models;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-/**
- * Address model representing the response data from /addresses endpoint
- */
 @Data
 public class Address {
     private int id;
@@ -22,4 +19,3 @@ public class Address {
     private double latitude;
     private double longitude;
 }
-

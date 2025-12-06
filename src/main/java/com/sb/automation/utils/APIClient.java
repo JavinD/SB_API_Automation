@@ -11,15 +11,9 @@ import java.util.Map;
 
 import static com.sb.automation.config.APIConfig.FULL_BASE_URL;
 
-/**
- * Base API client for making REST API calls
- */
 public class APIClient {
     private static final Logger logger = LoggerFactory.getLogger(APIClient.class);
 
-    /**
-     * Creates a base request specification with common headers
-     */
     public static RequestSpecification getRequestSpec() {
         return RestAssured
                 .given()
@@ -28,11 +22,8 @@ public class APIClient {
                 .header("Accept", "application/json");
     }
 
-    /**
-     * Makes a GET request with query parameters
-     */
     public static Response get(String endpoint, Map<String, Object> queryParams) {
-        logger.info("Making GET request to: {} with params: {}", endpoint, queryParams);
+        logger.info("GET {} params={}", endpoint, queryParams);
         
         RequestSpecification request = getRequestSpec();
         
@@ -47,22 +38,15 @@ public class APIClient {
                 .extract()
                 .response();
         
-        logger.info("Response Status Code: {}", response.getStatusCode());
-        logger.info("Response Time: {} ms", response.getTime());
+        logger.info("Status: {} Time: {}ms", response.getStatusCode(), response.getTime());
         
         return response;
     }
 
-    /**
-     * Makes a GET request without query parameters
-     */
     public static Response get(String endpoint) {
         return get(endpoint, new HashMap<>());
     }
 
-    /**
-     * Builder class for creating API requests with common parameters
-     */
     public static class RequestBuilder {
         private final String endpoint;
         private final Map<String, Object> queryParams;
@@ -101,4 +85,3 @@ public class APIClient {
         }
     }
 }
-
